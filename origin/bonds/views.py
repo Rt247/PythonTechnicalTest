@@ -6,6 +6,9 @@ from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework import status
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
 from .models import Bond
 from .serializers import BondSerializer
 from .thirdpartyapis import get_legal_name
@@ -14,6 +17,9 @@ class BondsListView(APIView):
     """
         View to ingest and query bond data
     """
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -28,6 +34,7 @@ class BondsListView(APIView):
             filters = {key: value for key, value in self.request.query_params.items() if key in valid_filters}
 
             bondsList = Bond.objects.all()
+            bondsList = Bond.objects.filter(user=request.user).values()
             bondsList = bondsList.filter(**filters)
 
             bonds_serializer = BondSerializer(bondsList, many=True)
@@ -58,8 +65,10 @@ class BondsListView(APIView):
                 updated_data['legal_name'] = legal_name
 
                 bonds_serializer = BondSerializer(data=updated_data)
+
                 if bonds_serializer.is_valid():
-                    bonds_serializer.save()
+                    print(bonds_serializer)
+                    bonds_serializer.save(user=self.request.user)
                     return JsonResponse(bonds_serializer.data, status=status.HTTP_201_CREATED)
 
         return JsonResponse(bonds_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
