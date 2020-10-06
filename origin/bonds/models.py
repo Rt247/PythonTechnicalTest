@@ -24,7 +24,8 @@ class Bond(models.Model):
     maturity = models.DateField()
     lei = models.CharField(max_length=200)
     legal_name = models.CharField(max_length=200)
-    user = models.ForeignKey(get_user_model(), default = 1, null = True, on_delete = models.SET_NULL)
+    user = models.ForeignKey(get_user_model(), default=1,
+                             null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.lei

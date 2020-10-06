@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
+import json
 
 from django.http.response import JsonResponse
 from rest_framework.parsers import JSONParser
@@ -39,6 +40,7 @@ class BondsListView(APIView):
 
             bonds_serializer = BondSerializer(bondsList, many=True)
 
+
             return JsonResponse(bonds_serializer.data, safe=False)
 
         except Bond.DoesNotExist:
@@ -67,7 +69,6 @@ class BondsListView(APIView):
                 bonds_serializer = BondSerializer(data=updated_data)
 
                 if bonds_serializer.is_valid():
-                    print(bonds_serializer)
                     bonds_serializer.save(user=self.request.user)
                     return JsonResponse(bonds_serializer.data, status=status.HTTP_201_CREATED)
 
