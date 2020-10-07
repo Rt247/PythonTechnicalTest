@@ -38,10 +38,18 @@ validGetBondDataTwo = {
 }
 
 class BondViewListAuthTestCase(APITestCase):
+    """
+        Test case to validate authentication is enforced for user
+        access to bonds
+    """
 
     bond_url = reverse("bonds")
 
     def setUp(self):
+        """
+            Setup the two different users and bonds for each user
+            Generate tokens for each user
+        """
         self.user = User.objects.create_user(username="test",
                                             password="super_strong_password")
         self.token = Token.objects.create(user=self.user)
@@ -57,20 +65,32 @@ class BondViewListAuthTestCase(APITestCase):
         self.bond_two.save()
 
     def api_authentication(self, token):
+        """
+            Authenticate the client with a given token
+        """
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
     def test_user_get_authenticated(self):
+        """
+            Validate bond access for valid tokens for a user
+        """
         self.api_authentication(self.token)
 
         response = self.client.get(self.bond_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_user_get_unauthenticated(self):
+        """
+            Validate bond access restricted to invalid tokens for a user
+        """
         self.client.force_authenticate(user=None)
         response = self.client.get(self.bond_url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_post_authenticated(self):
+        """
+            Validate bond post for valid tokens for a user
+        """
         self.api_authentication(self.token)
         response = self.client.post(self.bond_url,
                                     data=json.dumps(validPostBondData),
@@ -78,6 +98,9 @@ class BondViewListAuthTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_user_post_unauthenticated(self):
+        """
+            Validate bond post restricted for invalid tokens for a user
+        """
         self.client.force_authenticate(user=None)
         response = self.client.post(self.bond_url,
                                     data=json.dumps(validPostBondData),
@@ -85,6 +108,9 @@ class BondViewListAuthTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_user_bonds_only_retrieve(self):
+        """
+            Test data partition at a user level for bonds for query tokens
+        """
         self.api_authentication(self.token)
         response = self.client.get(self.bond_url)
 

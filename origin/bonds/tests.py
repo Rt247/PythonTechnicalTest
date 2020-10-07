@@ -1,7 +1,9 @@
 import json
 import sys
+
 from django.contrib.auth.models import User
 from django.urls import reverse
+
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
@@ -55,10 +57,16 @@ validGetBondModData = {
 
 
 class BondViewListRestTestCase(APITestCase):
+    """
+        Test the GET and POST requests for bonds
+    """
 
     bond_url = reverse("bonds")
 
     def setUp(self):
+        """
+            Setup a user and authenticate with token
+        """
         self.user = User.objects.create_user(username="test",
                                             password="super_strong_password")
         self.token = Token.objects.create(user=self.user)
@@ -66,9 +74,15 @@ class BondViewListRestTestCase(APITestCase):
 
 
     def api_authentication(self):
+        """
+            Authenticate user with a token header
+        """
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
     def test_user_empty_bonds_get(self):
+        """
+            Test to see if there no user bonds returns an empty list
+        """
 
         response = self.client.get(self.bond_url)
 
@@ -76,6 +90,9 @@ class BondViewListRestTestCase(APITestCase):
         self.assertEqual(len(json.loads(response.content)), 0)
 
     def test_user_single_bonds_get(self):
+        """
+            Test to see if the a singular bond insertion is valid
+        """
 
         bond_one = Bond(**validGetBondData)
         bond_one.save()
@@ -89,6 +106,9 @@ class BondViewListRestTestCase(APITestCase):
         self.assertEqual(len(json.loads(response.content)), 1)
 
     def test_user_multiple_bonds_get(self):
+        """
+            Test to see if multiple bonds inserted are valid
+        """
 
         bond_one = Bond(**validGetBondData)
         bond_one.save()
@@ -106,7 +126,9 @@ class BondViewListRestTestCase(APITestCase):
         self.assertEqual(len(json.loads(response.content)), 2)
 
     def test_user_bonds_filter_get(self):
-
+        """
+            Test to check if the filter works for two parameters
+        """
         bond_one = Bond(**validGetBondData)
         bond_one.save()
 
@@ -138,7 +160,10 @@ class BondViewListRestTestCase(APITestCase):
         self.assertEqual(len(json.loads(response_filter_currency.content)), 1)
 
     def test_gleif_legal_name_post(self):
-
+        """
+            Test to see if the GLEIF API post missing data fill is correct
+            for a known legal name and lei
+        """
         response = self.client.post(self.bond_url,
                                     data=json.dumps(validPostBondData),
                                     content_type='raw')
@@ -151,7 +176,10 @@ class BondViewListRestTestCase(APITestCase):
         self.assertEqual(len(json.loads(response.content)), 1)
 
     def test_gleif_invalid_legal_name_post(self):
-
+        """
+            Test to see if the GLEIF API post missing data fill is not valid
+            for an invalid lei
+        """
         response = self.client.post(self.bond_url,
                                     data=json.dumps(invalidLeiPostBondData),
                                     content_type='raw')
@@ -159,7 +187,10 @@ class BondViewListRestTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_gleif_invalid_legal_name_post(self):
-
+        """
+            Test to see if the GLEIF API post missing data fill is not valid
+            for a missing lei
+        """
         response = self.client.post(self.bond_url,
                                     data=json.dumps(invalidMissingDataPostBondData),
                                     content_type='raw')

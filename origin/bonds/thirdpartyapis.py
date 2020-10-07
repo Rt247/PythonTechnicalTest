@@ -1,8 +1,8 @@
 import requests
 
-def safeget(dct, *keys):
+def safeGet(dct, *keys):
     """
-        https://stackoverflow.com/questions/25833613/python-safe-method-to-get-value-of-nested-dictionary
+        Method to safely access nested values from a dictionary
     """
     for key in keys:
         try:
@@ -12,13 +12,16 @@ def safeget(dct, *keys):
     return dct
 
 def get_legal_name(lei):
+    """
+        Access the legal name from the GLEIF API using a given lei
+    """
 
     request_url = f"https://leilookup.gleif.org/api/v2/leirecords?lei={lei}"
     response = requests.get(request_url).json()
 
     # Validate Unique Response
     if len(response) == 1:
-        return safeget(response, 0, "Entity", "LegalName", "$")
+        return safeGet(response, 0, "Entity", "LegalName", "$")
 
     return None
 

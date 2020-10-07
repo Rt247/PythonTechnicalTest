@@ -2,16 +2,17 @@
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+
+    admin:
+        URL Path to the Django admin browser interface, need to create a superuser
+        to access in terminal
+    bonds:
+        URL path to the bonds api for GET and POST bonds
+    accounts:
+        URL path to the login signup and logout pages using default Django templates
+    auth:
+        URL path to generate an auth token for a registered user
+
 """
 from django.contrib import admin
 from django.urls import path, include

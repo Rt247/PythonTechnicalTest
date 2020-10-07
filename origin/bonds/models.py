@@ -16,7 +16,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-
 class Bond(models.Model):
     isin = models.CharField(max_length=200)
     size = models.IntegerField()

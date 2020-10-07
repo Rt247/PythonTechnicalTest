@@ -1,3 +1,7 @@
+"""
+    Using default django login, logout and signup templates
+"""
+
 from django.urls import path, include
 
 from .views import SignUpView
